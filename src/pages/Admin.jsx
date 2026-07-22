@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import BrandLogo from '../components/BrandLogo';
 import SubmissionTable from '../components/SubmissionTable';
 import { isAdminLoggedIn, loginAdmin, logoutAdmin } from '../utils/auth';
 import { getSubmissions } from '../utils/storage';
@@ -80,7 +81,7 @@ function Admin() {
     return (
       <div className="page admin-page">
         <header className="public-header">
-          <p className="brand">DATAALPHA AI</p>
+          <BrandLogo />
         </header>
 
         <main className="form-only-layout">
@@ -143,7 +144,7 @@ function Admin() {
   return (
     <div className="page admin-page">
       <nav className="top-nav">
-        <p className="brand">DATAALPHA AI Admin</p>
+        <BrandLogo showAdmin />
         <div className="nav-actions">
           <button type="button" className="btn btn-secondary" onClick={loadSubmissions} disabled={loading}>
             {loading ? 'Refreshing…' : 'Refresh'}

@@ -1,3 +1,4 @@
+import BrandLogo from '../components/BrandLogo';
 import SubscriptionForm from '../components/SubscriptionForm';
 
 /**
@@ -8,7 +9,7 @@ function Home() {
   return (
     <div className="page home-page">
       <header className="public-header">
-        <p className="brand">DATAALPHA AI</p>
+        <BrandLogo />
       </header>
 
       <main className="form-only-layout">

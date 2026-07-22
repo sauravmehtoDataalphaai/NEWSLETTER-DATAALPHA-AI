@@ -89,7 +89,7 @@ function SubscriptionForm() {
           <p className="form-eyebrow">Newsletter</p>
           <h1 className="form-title">Stay in the loop</h1>
           <p className="form-subtitle">
-            Enter your name and email to subscribe. We&apos;ll keep you updated.
+            Partnering with premier teams — enter your details and we&apos;ll be in touch.
           </p>
         </header>
 
