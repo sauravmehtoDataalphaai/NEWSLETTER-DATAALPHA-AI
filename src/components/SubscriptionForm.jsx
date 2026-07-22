@@ -3,8 +3,7 @@ import { addSubmission } from '../utils/storage';
 
 /**
  * SubscriptionForm
- * Validates name + email, saves to Supabase, shows thank-you popup,
- * then attempts to close the browser tab.
+ * Validates name + email, saves to Supabase, then shows a thank-you popup.
  */
 function SubscriptionForm() {
   const [name, setName] = useState('');
@@ -13,7 +12,6 @@ function SubscriptionForm() {
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
-  const [closeBlocked, setCloseBlocked] = useState(false);
 
   const isValidEmail = (value) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -35,16 +33,6 @@ function SubscriptionForm() {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const tryCloseWindow = () => {
-    window.close();
-
-    setTimeout(() => {
-      if (!window.closed) {
-        setCloseBlocked(true);
-      }
-    }, 300);
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitError('');
@@ -63,11 +51,6 @@ function SubscriptionForm() {
       setEmail('');
       setErrors({});
       setShowThanks(true);
-      setCloseBlocked(false);
-
-      setTimeout(() => {
-        tryCloseWindow();
-      }, 2000);
     } catch (err) {
       setSubmitError(err.message || 'Could not save your subscription. Please try again.');
     } finally {
@@ -84,15 +67,15 @@ function SubscriptionForm() {
 
   return (
     <>
-      <header className="form-header form-header--hero">
-        <p className="form-eyebrow">Newsletter</p>
-        <h1 className="form-title">Stay in the loop</h1>
-        <p className="form-subtitle">
-          Partnering with premier teams — enter your details and we&apos;ll be in touch.
-        </p>
-      </header>
+      <section className="form-card subscribe-card">
+        <header className="form-header">
+          <p className="form-eyebrow">Newsletter</p>
+          <h1 className="form-title">Stay Connected</h1>
+          <p className="form-subtitle">Enter your details and we&apos;ll be in touch.</p>
+        </header>
 
-      <section className="form-card">
+        <div className="form-divider" aria-hidden="true" />
+
         <form className="subscription-form" onSubmit={handleSubmit} noValidate>
           <div className="field">
             <label htmlFor="fullName">Full Name</label>
@@ -169,11 +152,11 @@ function SubscriptionForm() {
               Thank you!
             </h2>
             <p className="modal-text">We will contact you soon.</p>
-            {closeBlocked ? (
-              <p className="modal-hint">You can close this tab now.</p>
-            ) : (
-              <p className="modal-hint">This window will close automatically…</p>
-            )}
+            <div className="modal-actions">
+              <button type="button" className="btn btn-primary" onClick={() => setShowThanks(false)}>
+                OK
+              </button>
+            </div>
           </div>
         </div>
       )}
