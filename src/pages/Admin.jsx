@@ -80,7 +80,7 @@ function Admin() {
     return (
       <div className="page admin-page">
         <header className="public-header">
-          <p className="brand">DATAAPHA AI</p>
+          <p className="brand">DATAALPHA AI</p>
         </header>
 
         <main className="form-only-layout">
@@ -143,7 +143,7 @@ function Admin() {
   return (
     <div className="page admin-page">
       <nav className="top-nav">
-        <p className="brand">DATAAPHA AI Admin</p>
+        <p className="brand">DATAALPHA AI Admin</p>
         <div className="nav-actions">
           <button type="button" className="btn btn-secondary" onClick={loadSubmissions} disabled={loading}>
             {loading ? 'Refreshing…' : 'Refresh'}

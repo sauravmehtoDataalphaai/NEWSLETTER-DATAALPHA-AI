@@ -1,4 +1,4 @@
-# Deploy DATAAPHA AI on Render
+# Deploy DATAALPHA AI on Render
 
 ## If you already have a Node Web Service (your current setup)
 

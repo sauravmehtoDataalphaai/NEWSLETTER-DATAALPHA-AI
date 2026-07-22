@@ -8,7 +8,7 @@ function Home() {
   return (
     <div className="page home-page">
       <header className="public-header">
-        <p className="brand">DATAAPHA AI</p>
+        <p className="brand">DATAALPHA AI</p>
       </header>
 
       <main className="form-only-layout">

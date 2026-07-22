@@ -1,10 +1,10 @@
-# Render Blueprint options for DATAAPHA AI
+# Render Blueprint options for DATAALPHA AI
 # Docs: https://render.com/docs/blueprint-spec
 
 services:
   # Preferred if you use Static Site
   - type: web
-    name: dataapha-ai-subscribe
+    name: DATAALPHA-ai-subscribe
     runtime: static
     buildCommand: npm install && npm run build
     staticPublishPath: dist

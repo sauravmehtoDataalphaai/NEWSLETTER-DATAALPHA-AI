@@ -1,4 +1,4 @@
-# DATAAPHA AI — Supabase setup
+# DATAALPHA AI — Supabase setup
 
 ## 1. Create a Supabase project
 1. Go to https://supabase.com and create a free project
