@@ -125,6 +125,41 @@
   margin-bottom: 1.35rem;
 }
 
+/* Hero copy on navy background — three white shades */
+.form-header--hero {
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.form-header--hero .form-eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.form-header--hero .form-title {
+  color: #ffffff;
+  text-shadow: 0 1px 18px hsl(229deg 70% 10% / 35%);
+}
+
+.form-header--hero .form-subtitle {
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 34rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Admin login card keeps dark titles on light surface */
+.form-card .form-eyebrow {
+  color: var(--accent);
+}
+
+.form-card .form-title {
+  color: var(--ink-on-light);
+}
+
+.form-card .form-subtitle {
+  color: var(--ink-muted-on-light);
+}
+
 /* ========== Form ========== */
 .subscription-form {
   display: flex;

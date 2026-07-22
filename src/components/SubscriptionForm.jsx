@@ -84,15 +84,15 @@ function SubscriptionForm() {
 
   return (
     <>
-      <section className="form-card">
-        <header className="form-header">
-          <p className="form-eyebrow">Newsletter</p>
-          <h1 className="form-title">Stay in the loop</h1>
-          <p className="form-subtitle">
-            Partnering with premier teams — enter your details and we&apos;ll be in touch.
-          </p>
-        </header>
+      <header className="form-header form-header--hero">
+        <p className="form-eyebrow">Newsletter</p>
+        <h1 className="form-title">Stay in the loop</h1>
+        <p className="form-subtitle">
+          Partnering with premier teams — enter your details and we&apos;ll be in touch.
+        </p>
+      </header>
 
+      <section className="form-card">
         <form className="subscription-form" onSubmit={handleSubmit} noValidate>
           <div className="field">
             <label htmlFor="fullName">Full Name</label>
