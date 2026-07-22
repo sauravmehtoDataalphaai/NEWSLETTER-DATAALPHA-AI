@@ -1,6 +1,8 @@
-# Render Blueprint — Static Site for DATAAPHA AI subscription form
+# Render Blueprint options for DATAAPHA AI
 # Docs: https://render.com/docs/blueprint-spec
+
 services:
+  # Preferred if you use Static Site
   - type: web
     name: dataapha-ai-subscribe
     runtime: static

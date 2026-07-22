@@ -1,40 +1,41 @@
 # Deploy DATAAPHA AI on Render
 
-Skip GitHub details here — connect whatever repo you push later.
+## If you already have a Node Web Service (your current setup)
 
-## Option A — Dashboard (manual)
-
-1. Render → **New** → **Static Site**
-2. Connect your repo (when ready)
-3. Settings:
+In **Settings**, set:
 
 | Field | Value |
 |--------|--------|
 | **Build Command** | `npm install && npm run build` |
-| **Publish Directory** | `dist` |
+| **Start Command** | `npm start` |
 
-4. **Environment** → add:
+`npm start` runs `node server.js`, which serves `dist/` with correct **CSS/JS MIME types** (fixes unstyled UI).
+
+Then:
+1. Push this latest code to GitHub
+2. Render → **Manual Deploy** → **Clear build cache & deploy**
+
+Environment variables (required):
 
 ```
 VITE_SUPABASE_URL=https://jcyrwpzhpkubrgreuhxr.supabase.co
 VITE_SUPABASE_ANON_KEY=your_publishable_or_anon_key
 ```
 
-5. Deploy
-6. If `/admin` 404s on refresh, add **Rewrite**:
-   - Source: `/*`
-   - Destination: `/index.html`
-   - Action: Rewrite  
+After changing env vars, redeploy (Vite embeds them at **build** time).
 
-   (Also covered by `public/_redirects` after build.)
+---
 
-## Option B — Blueprint (`render.yaml`)
+## Option — Static Site (also fine)
 
-1. Push this project (including `render.yaml`) to your repo
-2. Render → **New** → **Blueprint**
-3. Select the repo
-4. Fill in `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` when prompted
-5. Deploy
+| Field | Value |
+|--------|--------|
+| **Build Command** | `npm install && npm run build` |
+| **Publish Directory** | `dist` |
+
+No Start Command needed. SPA rewrite: `/*` → `/index.html`.
+
+---
 
 ## After deploy — test
 
@@ -43,9 +44,4 @@ VITE_SUPABASE_ANON_KEY=your_publishable_or_anon_key
   - Username: `admin`
   - Password: `Admin@123`
 
-Share the form URL with testers. Their data appears in `/admin` via Supabase.
-
-## Important
-
-- Vite embeds env vars **at build time**. If you change env vars on Render, trigger a **redeploy**.
-- Never commit `.env` (it is gitignored).
+Styles should load (green theme, cards). If CSS still fails, hard-refresh (Ctrl+Shift+R).
