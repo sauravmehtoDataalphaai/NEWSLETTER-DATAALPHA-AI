@@ -1,17 +1,114 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { addSubmission, findSubmissionByEmail } from '../utils/storage';
+
+const REDIRECT_SECONDS = 5;
+
+/**
+ * Only allow safe absolute http(s) URLs for post-subscribe redirect.
+ */
+function isSafeExternalUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve where to send the user after thank-you:
+ * 1) ?returnUrl=... (most reliable for LinkedIn / shared links)
+ * 2) document.referrer if it's an external site
+ * 3) null → caller may try history.back()
+ */
+function resolveReturnTarget(returnUrlParam) {
+  if (returnUrlParam && isSafeExternalUrl(returnUrlParam)) {
+    return returnUrlParam;
+  }
+
+  const referrer = document.referrer;
+  if (referrer && isSafeExternalUrl(referrer)) {
+    try {
+      const refHost = new URL(referrer).hostname;
+      const selfHost = window.location.hostname;
+      if (refHost !== selfHost) return referrer;
+    } catch {
+      // ignore bad referrer
+    }
+  }
+
+  return null;
+}
 
 /**
  * SubscriptionForm
  * Validates name + email, blocks duplicates, saves to Supabase, then shows a thank-you popup.
+ * After success, redirects back (returnUrl / referrer / history) in 5 seconds; OK redirects immediately.
  */
 function SubscriptionForm() {
+  const [searchParams] = useSearchParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
+  const [countdown, setCountdown] = useState(REDIRECT_SECONDS);
+  const redirectTimerRef = useRef(null);
+  const countdownTimerRef = useRef(null);
+
+  const clearRedirectTimers = () => {
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+  };
+
+  const goBackOrClose = () => {
+    clearRedirectTimers();
+
+    const target = resolveReturnTarget(searchParams.get('returnUrl'));
+
+    if (target) {
+      window.location.assign(target);
+      return;
+    }
+
+    if (window.history.length > 1) {
+      window.history.back();
+      // If history.back() doesn't navigate away (same-tab edge cases), close the modal shortly after.
+      setTimeout(() => setShowThanks(false), 400);
+      return;
+    }
+
+    setShowThanks(false);
+  };
+
+  useEffect(() => {
+    if (!showThanks) {
+      clearRedirectTimers();
+      setCountdown(REDIRECT_SECONDS);
+      return undefined;
+    }
+
+    setCountdown(REDIRECT_SECONDS);
+
+    countdownTimerRef.current = setInterval(() => {
+      setCountdown((prev) => (prev > 1 ? prev - 1 : 0));
+    }, 1000);
+
+    redirectTimerRef.current = setTimeout(() => {
+      goBackOrClose();
+    }, REDIRECT_SECONDS * 1000);
+
+    return clearRedirectTimers;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- start timers only when modal opens
+  }, [showThanks]);
 
   const isValidEmail = (value) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -72,6 +169,9 @@ function SubscriptionForm() {
     setErrors({});
     setSubmitError('');
   };
+
+  const canAutoRedirect =
+    Boolean(resolveReturnTarget(searchParams.get('returnUrl'))) || window.history.length > 1;
 
   return (
     <>
@@ -160,8 +260,13 @@ function SubscriptionForm() {
               Thank you!
             </h2>
             <p className="modal-text">We will contact you soon.</p>
+            {canAutoRedirect && (
+              <p className="modal-hint" aria-live="polite">
+                Taking you back in {countdown}s…
+              </p>
+            )}
             <div className="modal-actions">
-              <button type="button" className="btn btn-primary" onClick={() => setShowThanks(false)}>
+              <button type="button" className="btn btn-primary" onClick={goBackOrClose}>
                 OK
               </button>
             </div>
