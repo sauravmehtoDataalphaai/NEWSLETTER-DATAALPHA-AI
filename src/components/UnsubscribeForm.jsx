@@ -1,17 +1,67 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { unsubscribeByEmail } from '../utils/storage';
+import {
+  REDIRECT_SECONDS,
+  canAutoRedirect,
+  navigateReturnOrBack,
+} from '../utils/returnRedirect';
 
 /**
  * UnsubscribeForm
  * Looks up the email in Supabase and deletes the matching subscription row(s).
+ * After success, redirects back (returnUrl / referrer / history) in 5 seconds.
  */
 function UnsubscribeForm() {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successName, setSuccessName] = useState(null);
+  const [countdown, setCountdown] = useState(REDIRECT_SECONDS);
+  const redirectTimerRef = useRef(null);
+  const countdownTimerRef = useRef(null);
+  const returnUrl = searchParams.get('returnUrl');
+  const willAutoRedirect = canAutoRedirect(returnUrl);
+  const isSuccess = successName !== null;
+
+  const clearRedirectTimers = () => {
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+  };
+
+  const goBackOrStay = () => {
+    clearRedirectTimers();
+    navigateReturnOrBack(returnUrl);
+  };
+
+  useEffect(() => {
+    if (!isSuccess) {
+      clearRedirectTimers();
+      setCountdown(REDIRECT_SECONDS);
+      return undefined;
+    }
+
+    setCountdown(REDIRECT_SECONDS);
+
+    countdownTimerRef.current = setInterval(() => {
+      setCountdown((prev) => (prev > 1 ? prev - 1 : 0));
+    }, 1000);
+
+    redirectTimerRef.current = setTimeout(() => {
+      goBackOrStay();
+    }, REDIRECT_SECONDS * 1000);
+
+    return clearRedirectTimers;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- start timers only when success view opens
+  }, [isSuccess]);
 
   const isValidEmail = (value) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -52,10 +102,12 @@ function UnsubscribeForm() {
   };
 
   const handleClear = () => {
+    clearRedirectTimers();
     setEmail('');
     setError('');
     setSubmitError('');
     setSuccessName(null);
+    setCountdown(REDIRECT_SECONDS);
   };
 
   return (
@@ -70,7 +122,7 @@ function UnsubscribeForm() {
 
       <div className="form-divider" aria-hidden="true" />
 
-      {successName !== null ? (
+      {isSuccess ? (
         <div className="unsubscribe-success" role="status">
           <h2 className="unsubscribe-success-title">You&apos;ve been unsubscribed</h2>
           <p className="unsubscribe-success-text">
@@ -78,14 +130,30 @@ function UnsubscribeForm() {
               ? `${successName}, your email has been removed from our newsletter.`
               : 'Your email has been removed from our newsletter.'}
           </p>
+          {willAutoRedirect && (
+            <p className="unsubscribe-redirect-hint" aria-live="polite">
+              Taking you back in {countdown}s…
+            </p>
+          )}
           <div className="form-actions">
-            <Link to="/" className="btn btn-primary">
-              Back to Subscribe
-            </Link>
+            {willAutoRedirect ? (
+              <button type="button" className="btn btn-primary" onClick={goBackOrStay}>
+                Go back
+              </button>
+            ) : (
+              <Link to="/" className="btn btn-primary">
+                Back to Subscribe
+              </Link>
+            )}
             <button type="button" className="btn btn-secondary" onClick={handleClear}>
               Unsubscribe another
             </button>
           </div>
+          {willAutoRedirect && (
+            <p className="unsubscribe-footer">
+              Or <Link to="/">go back to Subscribe</Link>
+            </p>
+          )}
         </div>
       ) : (
         <form className="subscription-form" onSubmit={handleSubmit} noValidate>

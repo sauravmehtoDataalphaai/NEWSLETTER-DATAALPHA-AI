@@ -1,45 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { addSubmission, findSubmissionByEmail } from '../utils/storage';
-
-const REDIRECT_SECONDS = 5;
-
-/**
- * Only allow safe absolute http(s) URLs for post-subscribe redirect.
- */
-function isSafeExternalUrl(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Resolve where to send the user after thank-you:
- * 1) ?returnUrl=... (most reliable for LinkedIn / shared links)
- * 2) document.referrer if it's an external site
- * 3) null → caller may try history.back()
- */
-function resolveReturnTarget(returnUrlParam) {
-  if (returnUrlParam && isSafeExternalUrl(returnUrlParam)) {
-    return returnUrlParam;
-  }
-
-  const referrer = document.referrer;
-  if (referrer && isSafeExternalUrl(referrer)) {
-    try {
-      const refHost = new URL(referrer).hostname;
-      const selfHost = window.location.hostname;
-      if (refHost !== selfHost) return referrer;
-    } catch {
-      // ignore bad referrer
-    }
-  }
-
-  return null;
-}
+import {
+  REDIRECT_SECONDS,
+  canAutoRedirect,
+  navigateReturnOrBack,
+} from '../utils/returnRedirect';
 
 /**
  * SubscriptionForm
@@ -57,6 +23,8 @@ function SubscriptionForm() {
   const [countdown, setCountdown] = useState(REDIRECT_SECONDS);
   const redirectTimerRef = useRef(null);
   const countdownTimerRef = useRef(null);
+  const returnUrl = searchParams.get('returnUrl');
+  const willAutoRedirect = canAutoRedirect(returnUrl);
 
   const clearRedirectTimers = () => {
     if (redirectTimerRef.current) {
@@ -71,22 +39,13 @@ function SubscriptionForm() {
 
   const goBackOrClose = () => {
     clearRedirectTimers();
-
-    const target = resolveReturnTarget(searchParams.get('returnUrl'));
-
-    if (target) {
-      window.location.assign(target);
+    const navigated = navigateReturnOrBack(returnUrl);
+    if (!navigated) {
+      setShowThanks(false);
       return;
     }
-
-    if (window.history.length > 1) {
-      window.history.back();
-      // If history.back() doesn't navigate away (same-tab edge cases), close the modal shortly after.
-      setTimeout(() => setShowThanks(false), 400);
-      return;
-    }
-
-    setShowThanks(false);
+    // If history.back() doesn't leave the page, close the modal shortly after.
+    setTimeout(() => setShowThanks(false), 400);
   };
 
   useEffect(() => {
@@ -169,9 +128,6 @@ function SubscriptionForm() {
     setErrors({});
     setSubmitError('');
   };
-
-  const canAutoRedirect =
-    Boolean(resolveReturnTarget(searchParams.get('returnUrl'))) || window.history.length > 1;
 
   return (
     <>
@@ -260,7 +216,7 @@ function SubscriptionForm() {
               Thank you!
             </h2>
             <p className="modal-text">We will contact you soon.</p>
-            {canAutoRedirect && (
+            {willAutoRedirect && (
               <p className="modal-hint" aria-live="polite">
                 Taking you back in {countdown}s…
               </p>
