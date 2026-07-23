@@ -1,6 +1,10 @@
 import { useMemo, useState } from 'react';
+import { FileSpreadsheet } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { formatTimestamp, removeSubmission } from '../utils/storage';
 import './SubmissionTable.css';
+
+const EXPORT_API_URL = 'https://newsletter-dataalphaai.onrender.com';
 
 function getInitials(name = '') {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -21,6 +25,28 @@ function getRecency(timestamp) {
   if (date >= startOfToday) return 'today';
   if (diffDays <= 7) return 'recent';
   return null;
+}
+
+function getTimePeriod(hour) {
+  if (hour >= 5 && hour < 12) return 'Morning';
+  if (hour >= 12 && hour < 17) return 'Afternoon';
+  if (hour >= 17 && hour < 21) return 'Evening';
+  return 'Night';
+}
+
+function formatExportDate(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+}
+
+function formatExportTime(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  const hour = d.getUTCHours();
+  return `${pad(hour)}:${pad(d.getUTCMinutes())} (${getTimePeriod(hour)})`;
 }
 
 function SearchIcon() {
@@ -82,6 +108,8 @@ function SubmissionTable({ submissions, onDelete, loading = false, loadError = '
   const [sortKey, setSortKey] = useState('timestamp');
   const [sortDir, setSortDir] = useState('desc');
   const [copiedId, setCopiedId] = useState(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -154,6 +182,40 @@ function SubmissionTable({ submissions, onDelete, loading = false, loadError = '
     }
   };
 
+  const handleExportExcel = async () => {
+    setExportError('');
+    setExporting(true);
+
+    try {
+      const res = await fetch(EXPORT_API_URL);
+      if (!res.ok) {
+        throw new Error(`Export failed (${res.status}). Could not fetch subscribers.`);
+      }
+
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Unexpected API response. Expected a list of subscribers.');
+      }
+
+      const rows = data.map((item, index) => ({
+        'Sequence No': index + 1,
+        Name: item.name ?? '',
+        'Email ID': item.email ?? '',
+        DATE: formatExportDate(item.created_at),
+        Time: formatExportTime(item.created_at),
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Subscribers');
+      XLSX.writeFile(workbook, 'subscribers.xlsx');
+    } catch (err) {
+      setExportError(err.message || 'Could not export to Excel.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="st-container">
       <section className="table-card st-table-card">
@@ -168,12 +230,12 @@ function SubmissionTable({ submissions, onDelete, loading = false, loadError = '
           </div>
         </header>
 
-        {(loadError || deleteError) && (
+        {(loadError || deleteError || exportError) && (
           <div className="st-error-banner" role="alert">
             <span className="st-error-icon" aria-hidden="true">
               ⚠
             </span>
-            <span>{loadError || deleteError}</span>
+            <span>{loadError || deleteError || exportError}</span>
           </div>
         )}
 
@@ -187,6 +249,16 @@ function SubmissionTable({ submissions, onDelete, loading = false, loadError = '
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search subscribers"
           />
+          <button
+            type="button"
+            className="st-export-btn"
+            onClick={handleExportExcel}
+            disabled={exporting}
+            aria-label="Export subscribers to Excel"
+          >
+            <FileSpreadsheet size={18} aria-hidden="true" />
+            <span>{exporting ? 'Exporting…' : 'Export to Excel'}</span>
+          </button>
         </div>
 
         {loading ? (

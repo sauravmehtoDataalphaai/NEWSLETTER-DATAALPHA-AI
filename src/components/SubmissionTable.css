@@ -97,6 +97,34 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
+.st-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid hsl(142deg 45% 38% / 45%);
+  border-radius: 10px;
+  background: hsl(142deg 50% 28% / 55%);
+  color: rgba(255, 255, 255, 0.95);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 560;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, opacity 160ms ease;
+}
+
+.st-export-btn:hover:not(:disabled) {
+  background: hsl(142deg 52% 32% / 70%);
+  border-color: hsl(142deg 50% 48% / 55%);
+}
+
+.st-export-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .st-table-wrap {
   overflow-x: auto;
 }
@@ -361,6 +389,15 @@
 }
 
 @media (max-width: 768px) {
+  .st-search-container {
+    flex-wrap: wrap;
+  }
+
+  .st-export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .st-table-header {
     flex-direction: column;
     align-items: flex-start;
