@@ -189,7 +189,7 @@ function SubmissionTable({ submissions, onDelete, loading = false, loadError = '
       const data = await getSubmissions();
 
       const rows = data.map((item, index) => ({
-        'Sequence No': index + 1,
+        'S.No': index + 1,
         Name: item.name ?? '',
         'Email ID': item.email ?? '',
         DATE: formatExportDate(item.timestamp),
