@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback so /admin (and any other client-side route) works on refresh.
+# public/_redirects already covers this too, but keeping it here as well
+# makes the rule explicit and visible in the Netlify dashboard.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
