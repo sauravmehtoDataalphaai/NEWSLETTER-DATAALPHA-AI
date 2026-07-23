@@ -156,6 +156,48 @@
   color: hsl(353, 31%, 94%);
 }
 
+.unsubscribe-success {
+  text-align: left;
+}
+
+.unsubscribe-success-title {
+  margin: 0 0 0.55rem;
+  font-size: 1.2rem;
+  font-weight: 650;
+  color: hsl(242, 57%, 92%);
+}
+
+.unsubscribe-success-text {
+  margin: 0 0 1.35rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: hsl(353, 31%, 94%);
+}
+
+.unsubscribe-footer {
+  margin: 1.1rem 0 0;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.72);
+  text-align: center;
+}
+
+.unsubscribe-footer a {
+  color: hsl(186, 70%, 72%);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.unsubscribe-footer a:hover {
+  color: hsl(186, 80%, 82%);
+}
+
+.form-actions a.btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .form-divider {
   height: 1px;
   margin: 0 0 1.35rem;

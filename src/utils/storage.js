@@ -29,6 +29,27 @@ export async function getSubmissions() {
 }
 
 /**
+ * Look up a subscription by email (stored lowercase).
+ * Returns the first matching mapped row, or null if not found.
+ */
+export async function findSubmissionByEmail(email) {
+  const normalized = email.trim().toLowerCase();
+
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('id, name, email, created_at')
+    .eq('email', normalized)
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data?.[0] ? mapRow(data[0]) : null;
+}
+
+/**
  * Insert a new subscription into Supabase.
  * Returns the updated list.
  */
@@ -54,6 +75,29 @@ export async function removeSubmission(id) {
   }
 
   return getSubmissions();
+}
+
+/**
+ * Delete all subscription rows matching the given email.
+ * Returns { deleted: true, name } or { deleted: false }.
+ */
+export async function unsubscribeByEmail(email) {
+  const existing = await findSubmissionByEmail(email);
+
+  if (!existing) {
+    return { deleted: false };
+  }
+
+  const { error } = await supabase
+    .from('subscriptions')
+    .delete()
+    .eq('email', email.trim().toLowerCase());
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return { deleted: true, name: existing.name };
 }
 
 /**

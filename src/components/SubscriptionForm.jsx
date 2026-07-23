@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { addSubmission } from '../utils/storage';
+import { addSubmission, findSubmissionByEmail } from '../utils/storage';
 
 /**
  * SubscriptionForm
- * Validates name + email, saves to Supabase, then shows a thank-you popup.
+ * Validates name + email, blocks duplicates, saves to Supabase, then shows a thank-you popup.
  */
 function SubscriptionForm() {
   const [name, setName] = useState('');
@@ -42,9 +42,17 @@ function SubscriptionForm() {
     setIsSubmitting(true);
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const existing = await findSubmissionByEmail(normalizedEmail);
+
+      if (existing) {
+        setErrors({ email: 'This email is already subscribed.' });
+        return;
+      }
+
       await addSubmission({
         name: name.trim(),
-        email: email.trim().toLowerCase(),
+        email: normalizedEmail,
       });
 
       setName('');
