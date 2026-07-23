@@ -1,10 +1,8 @@
 import { useMemo, useState } from 'react';
 import { FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { formatTimestamp, removeSubmission } from '../utils/storage';
+import { formatTimestamp, getSubmissions, removeSubmission } from '../utils/storage';
 import './SubmissionTable.css';
-
-const EXPORT_API_URL = 'https://newsletter-dataalphaai.onrender.com';
 
 function getInitials(name = '') {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -187,22 +185,15 @@ function SubmissionTable({ submissions, onDelete, loading = false, loadError = '
     setExporting(true);
 
     try {
-      const res = await fetch(EXPORT_API_URL);
-      if (!res.ok) {
-        throw new Error(`Export failed (${res.status}). Could not fetch subscribers.`);
-      }
-
-      const data = await res.json();
-      if (!Array.isArray(data)) {
-        throw new Error('Unexpected API response. Expected a list of subscribers.');
-      }
+      // Same source as the admin table (Supabase). The Render URL is the SPA HTML, not JSON.
+      const data = await getSubmissions();
 
       const rows = data.map((item, index) => ({
         'Sequence No': index + 1,
         Name: item.name ?? '',
         'Email ID': item.email ?? '',
-        DATE: formatExportDate(item.created_at),
-        Time: formatExportTime(item.created_at),
+        DATE: formatExportDate(item.timestamp),
+        Time: formatExportTime(item.timestamp),
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(rows);
