@@ -168,6 +168,93 @@
   );
 }
 
+.admin-login-card .form-divider {
+  margin-top: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(229deg 40% 80% / 45%) 20%,
+    hsl(229deg 40% 80% / 45%) 80%,
+    transparent
+  );
+}
+
+/* Admin sign-in hero — three whitish shades on navy */
+.form-header--hero {
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.form-header--hero .form-eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.form-header--hero .form-title {
+  color: #ffffff;
+  text-shadow: 0 1px 18px hsl(229deg 70% 10% / 35%);
+}
+
+.form-header--hero .form-subtitle {
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 34rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Dashboard table-card — dark glass + whitish text shades */
+.table-card {
+  background: hsl(229deg 55% 16% / 78%);
+  border-color: hsl(229deg 40% 80% / 22%);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.table-card .table-title {
+  color: #ffffff;
+}
+
+.table-card .table-subtitle {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.table-card .count-badge {
+  background: hsl(229deg 70% 20% / 45%);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid hsl(229deg 40% 80% / 25%);
+}
+
+.table-card .submissions-table {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.table-card .submissions-table th {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.table-card .submissions-table td {
+  color: rgba(255, 255, 255, 0.88);
+  border-bottom-color: hsl(229deg 40% 80% / 18%);
+}
+
+.table-card .submissions-table tbody tr:hover {
+  background: hsl(229deg 70% 20% / 35%);
+}
+
+.table-card .empty-state {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.table-card .empty-hint {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.table-card .field-error {
+  color: #ffb4a8;
+}
+
+.table-card .submissions-table td::before {
+  color: rgba(255, 255, 255, 0.55);
+}
+
 /* ========== Form ========== */
 .subscription-form {
   display: flex;

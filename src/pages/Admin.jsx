@@ -80,63 +80,67 @@ function Admin() {
   if (!loggedIn) {
     return (
       <div className="page admin-page">
-        <header className="public-header">
-          <BrandLogo />
-        </header>
+        <div className="subscribe-shell">
+          <header className="public-header">
+            <BrandLogo />
+          </header>
 
-        <main className="form-only-layout">
-          <section className="form-card">
-            <header className="form-header">
-              <p className="form-eyebrow">Admin</p>
-              <h1 className="form-title">Sign in</h1>
-              <p className="form-subtitle">
-                Enter your admin credentials to view subscriber data.
-              </p>
-            </header>
-
-            <form className="subscription-form" onSubmit={handleLogin} noValidate>
-              <div className="field">
-                <label htmlFor="adminUsername">Username</label>
-                <input
-                  id="adminUsername"
-                  type="text"
-                  autoComplete="username"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value);
-                    if (error) setError('');
-                  }}
-                />
-              </div>
-
-              <div className="field">
-                <label htmlFor="adminPassword">Password</label>
-                <input
-                  id="adminPassword"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) setError('');
-                  }}
-                />
-              </div>
-
-              {error && (
-                <p className="field-error" role="alert">
-                  {error}
+          <main className="form-only-layout">
+            <section className="form-card subscribe-card">
+              <header className="form-header">
+                <p className="form-eyebrow">Admin</p>
+                <h1 className="form-title">Sign in</h1>
+                <p className="form-subtitle">
+                  Enter your admin credentials to view subscriber data.
                 </p>
-              )}
+              </header>
 
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">
-                  Login
-                </button>
-              </div>
-            </form>
-          </section>
-        </main>
+              <div className="form-divider" aria-hidden="true" />
+
+              <form className="subscription-form" onSubmit={handleLogin} noValidate>
+                <div className="field">
+                  <label htmlFor="adminUsername">Username</label>
+                  <input
+                    id="adminUsername"
+                    type="text"
+                    autoComplete="username"
+                    value={username}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
+
+                <div className="field">
+                  <label htmlFor="adminPassword">Password</label>
+                  <input
+                    id="adminPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
+
+                {error && (
+                  <p className="field-error" role="alert">
+                    {error}
+                  </p>
+                )}
+
+                <div className="form-actions">
+                  <button type="submit" className="btn btn-primary">
+                    Login
+                  </button>
+                </div>
+              </form>
+            </section>
+          </main>
+        </div>
       </div>
     );
   }
